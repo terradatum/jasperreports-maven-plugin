@@ -13,7 +13,7 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>jasperreports-plugin</artifactId>
+				<artifactId>jasperreports-maven-plugin</artifactId>
 				<executions>
 					<execution>
 						<phase>process-sources</phase>

@@ -11,26 +11,9 @@ package com.alexnederlof.jasperreport;
  * for the specific language governing permissions and limitations under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRPropertiesUtil;
-import net.sf.jasperreports.engine.design.JRCompiler;
 import net.sf.jasperreports.engine.design.JRJdtCompiler;
-import net.sf.jasperreports.engine.xml.JRReportSaxParserFactory;
-
+import net.sf.jasperreports.engine.util.JRProperties;
 import org.apache.commons.lang.Validate;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -40,6 +23,15 @@ import org.codehaus.plexus.compiler.util.scan.SourceInclusionScanner;
 import org.codehaus.plexus.compiler.util.scan.StaleSourceScanner;
 import org.codehaus.plexus.compiler.util.scan.mapping.SourceMapping;
 import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * This plugin compiles jasper source files to the target folder. While doing so, it keeps the
@@ -65,7 +57,7 @@ public class JasperReporter extends AbstractMojo {
 	/**
 	 * This is where the .jasper files are written.
 	 *
-	 * @parameter property="${project.build.outputDirectory}/jasper"
+	 * @parameter expression="${project.build.outputDirectory}/jasper"
 	 */
 	private File outputDirectory;
 
@@ -129,8 +121,7 @@ public class JasperReporter extends AbstractMojo {
 	 * <configuration>
 	 * 	...
 	 * 		<additionalProperties>
-	 * 			<net.sf.jasperreports.awt.ignore.missing.font>true
-	 *			</net.sf.jasperreports.awt.ignore.missing.font>
+	 * 			<net.sf.jasperreports.awt.ignore.missing.font>true</net.sf.jasperreports.awt.ignore.missing.font>
 	 *          <net.sf.jasperreports.default.pdf.font.name>Courier</net.sf.jasperreports.default.pdf.font.name>
 	 *          <net.sf.jasperreports.default.pdf.encoding>UTF-8</net.sf.jasperreports.default.pdf.encoding>
 	 *          <net.sf.jasperreports.default.pdf.embedded>true</net.sf.jasperreports.default.pdf.embedded>
@@ -240,14 +231,13 @@ public class JasperReporter extends AbstractMojo {
 	}
 
 	private void configureJasper() {
-		DefaultJasperReportsContext jrContext = DefaultJasperReportsContext.getInstance();
-
-        jrContext.setProperty(JRReportSaxParserFactory.COMPILER_XML_VALIDATION, String.valueOf(xmlValidation));
-		jrContext.setProperty(JRCompiler.COMPILER_PREFIX, compiler == null ? JRJdtCompiler.class.getName() : compiler);
-		jrContext.setProperty(JRCompiler.COMPILER_KEEP_JAVA_FILE, Boolean.FALSE.toString());
+		JRProperties.setProperty(JRProperties.COMPILER_CLASS, compiler == null ? JRJdtCompiler.class.getName() : compiler);
+		JRProperties.setProperty(JRProperties.COMPILER_XML_VALIDATION, xmlValidation);
 
 		if (additionalProperties != null) {
-			configureAdditionalProperties(JRPropertiesUtil.getInstance(jrContext));
+			for (Map.Entry<String, String> additionalProperty : additionalProperties.entrySet()) {
+                JRProperties.setProperty(additionalProperty.getKey(), additionalProperty.getValue());
+            }
 		}
 
 	}
@@ -269,12 +259,6 @@ public class JasperReporter extends AbstractMojo {
         URL[] urls = classpath.toArray(new URL[classpath.size()]);
         return new URLClassLoader(urls, classLoader);
     }
-
-    private void configureAdditionalProperties(JRPropertiesUtil propertiesUtil) {
-		for (Map.Entry<String, String> additionalProperty : additionalProperties.entrySet()) {
-			propertiesUtil.setProperty(additionalProperty.getKey(), additionalProperty.getValue());
-		}
-	}
 
 	private void checkIfOutputCanBeCreated() throws MojoExecutionException {
 		if (!outputDirectory.mkdirs()) {

@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.alexnederlof</groupId>
-	<artifactId>jasperreports-plugin</artifactId>
+	<groupId>com.terradatum</groupId>
+	<artifactId>jasperreports-maven-plugin</artifactId>
 
 	<packaging>maven-plugin</packaging>
 	<version>2.1-SNAPSHOT</version>
-	<name>jasperreport-plugin</name>
+	<name>jasperreports-maven-plugin</name>
 	<description>A Jasper compiler plugin</description>
-	<url>http://github.com/alexnederlof/Jasper-report-maven-plugin</url>
+	<url>http://github.com/terradatum/jasperreports-maven-plugin</url>
 
 
 	<properties>
@@ -16,26 +16,33 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- not ideal - but necessary as all the tests are post jasperreports 5 -->
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<prerequisites>
-		<maven>3.1.0</maven>
+		<maven>3.0.4</maven>
 	</prerequisites>
 
 	<scm>
-		<connection>scm:git:git@github.com:alexnederlof/Jasper-report-maven-plugin.git</connection>
-		<url>http://github.com/alexnederlof/Jasper-report-maven-plugin</url>
-		<developerConnection>scm:git:git@github.com:alexnederlof/Jasper-report-maven-plugin.git</developerConnection>
+		<connection>scm:git:git@github.com:terradatum/jasperreports-maven-plugin.git</connection>
+		<url>http://github.com/terradatum/jasperreports-maven-plugin</url>
+		<developerConnection>scm:git:git@github.com:terradatum/jasperreports-maven-plugin.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>Local</name>
+			<url>https://nexus.terradatum.com/content/repositories/releases/</url>
+		</repository>
 		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>snapshots</id>
+			<name>Internal Snapshots</name>
+			<url>https://nexus.terradatum.com/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-
 
 	<developers>
 		<developer>
@@ -52,6 +59,12 @@
 		<developer>
 			<id>lucarota</id>
 			<name>Luca Rota</name>
+		</developer>
+
+		<developer>
+			<id>rbellamy</id>
+			<name>G. Richard Bellamy</name>
+			<email>rbellamy@terradatum.com</email>
 		</developer>
 	</developers>
 
@@ -79,7 +92,19 @@
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>6.1.1</version>
+			<version>3.7.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>eclipse</groupId>
+					<artifactId>jdtcore</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>core</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 
 		<dependency>
@@ -92,12 +117,6 @@
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-fonts</artifactId>
-			<version>6.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -172,7 +191,7 @@
 					</tags>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>1.6.3</version>
@@ -182,7 +201,7 @@
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
-			</plugin>
+			</plugin-->
 		</plugins>
 	</build>
 

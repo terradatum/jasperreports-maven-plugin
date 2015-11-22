@@ -11,27 +11,21 @@ package com.alexnederlof.jasperreport;
  * for the specific language governing permissions and limitations under the License.
  */
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import net.sf.jasperreports.engine.DefaultJasperReportsContext;
+import com.google.common.io.NullOutputStream;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-
+import net.sf.jasperreports.engine.util.JRProperties;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
-import com.google.common.io.NullOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Test the report generation.
@@ -85,10 +79,8 @@ public class JasperReportTest extends AbstractMojoTestCase {
 		setupSourceAndDestinationFolder("/sampleReports", "/sampleReports_out");
 
 		getAndExecuteMojo(pluginPom);
-		String defaultPdfFontName = DefaultJasperReportsContext.getInstance()
-			.getProperty("net.sf.jasperreports.default.pdf.font.name");
-		String pdfEmbeddedValue = DefaultJasperReportsContext.getInstance()
-			.getProperty("net.sf.jasperreports.default.pdf.embedded");
+		String defaultPdfFontName = JRProperties.getProperty("net.sf.jasperreports.default.pdf.font.name");
+		String pdfEmbeddedValue = JRProperties.getProperty("net.sf.jasperreports.default.pdf.embedded");
 
 		assertEquals("Files from sourcefolder do not correspond to files in the destinationFolder",
 				sourceFolder.listFiles().length, destinationFolder.listFiles().length);
